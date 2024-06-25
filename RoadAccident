@@ -1,0 +1,52 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Example dataset (replace with your actual dataset)
+data = {
+    'Weather': ['Clear', 'Rain', 'Snow', 'Clear', 'Rain'],
+    'Road_Type': ['Highway', 'City street', 'Highway', 'City street', 'City street'],
+    'Visibility': ['Good', 'Poor', 'Poor', 'Good', 'Poor'],
+    'Accident': [0, 1, 1, 0, 1]  # 0: No accident, 1: Accident
+}
+
+df = pd.DataFrame(data)
+
+# Preprocessing: One-hot encoding categorical variables
+df = pd.get_dummies(df, columns=['Weather', 'Road_Type', 'Visibility'], drop_first=True)
+
+# Separate features (X) and target variable (y)
+X = df.drop('Accident', axis=1)
+y = df['Accident']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model training
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Model evaluation
+y_pred = model.predict(X_test)
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# Example prediction
+new_data = {
+    'Weather_Clear': [1],
+    'Weather_Rain': [0],
+    'Road_Type_Highway': [1],
+    'Visibility_Poor': [0]
+}
+
+new_df = pd.DataFrame(new_data)
+
+# Predicting whether an accident will occur (1) or not (0)
+prediction = model.predict(new_df)
+if prediction[0] == 1:
+    print("\nPrediction: Accident is likely to occur.")
+else:
+    print("\nPrediction: No accident is likely to occur.")
